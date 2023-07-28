@@ -232,8 +232,17 @@ PHPで実装したサーバーに通信をする
       class Myclass
       呼び出し
       use MyApp\Myclass
+      require 
+      この二つが必要
 
-      
+
+
+
+      JavaScript fatch
+
+      WEBソケットでDB削除してそれが自動で反映されるようにしたい
+
+      順番1 削除が行われたらサーバー側でwebソケットを使用してクライアントに通知する
 
 
 

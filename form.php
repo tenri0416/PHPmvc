@@ -1,20 +1,23 @@
 <?php
- require 'model/mysqlconnection.php';
+ require 'model/mysql.class.php';
 $mysql=new MysqlConnection();
 
 $allComments=$mysql->AllSelect();
 //json化してJSに渡す
 $json_allComments=json_encode($allComments);
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>tyatApp</title>
+    <link rel="stylesheet" href="css/form.css"></link>
+    <!-- WEBソケット読み込み -->
+    <script src="web.js"></script>
 </head>
 <body>
+<script src="web.js"></script>
 <form class="Form" action="" method="post">
   <div class="Form-Item">
     <p class="Form-Item-Label">ユーザー名</p>
@@ -31,8 +34,9 @@ $json_allComments=json_encode($allComments);
 <button type="button" onclick="autoStopMessage()">ストップ</button>
 
 <div id="view_count" class="count-item"></div>
-<div id="socket">
-<script>
+
+  <div id="socket">
+    <script>
 const comments_Arr = <?php echo $json_allComments; ?>;
 const messageDiv = document.getElementById('socket');
 const count_div=document.getElementById('view_count');
@@ -41,140 +45,25 @@ let count=comments_Arr.length;
 count_div.innerHTML=`${count}件表示しています。`;
 
 for(i=0;i<comments_Arr.length;i++){
-  messageDiv.innerHTML += `<p class='list-item'>${comments_Arr[i].name}:${comments_Arr[i].comment}</p>`;
+  messageDiv.innerHTML += `<p class='list-item'>${comments_Arr[i].id}${comments_Arr[i].name}:${comments_Arr[i].comment}<button onclick="deleteBtn(${comments_Arr[i].id,true})">削除</button></p>`;
+
 }
 
 </script>
 </div>
   
-   <style>
-  .count-item{
-    text-align: center;
-  }
-   .Form {
-  margin-top: 2px;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 720px;
-}
-
-.Form-Item {
-
-  padding-top: 2px;
-  padding-bottom: 10px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.Form-Item-Label {
-  width: 100%;
-  max-width: 248px;
-  letter-spacing: 0.05em;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-
-.Form-Item-Label.isMsg {
-  margin-top: 8px;
-  margin-bottom: auto;
-}
-
-.Form-Item-Input {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-left: 40px;
-  padding-left: 1em;
-  padding-right: 1em;
-  height: 28px;
-  flex: 1;
-  width: 100%;
-  max-width: 410px;
-  background: #eaedf2;
-  font-size: 18px;
-}
-
-.Form-Item-Textarea {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-left: 40px;
-  padding-left: 1em;
-  padding-right: 1em;
-  height: 40px;
-  flex: 1;
-  width: 100%;
-  max-width: 410px;
-  background: #eaedf2;
-  font-size: 18px;
-}
-
-.Form-Btn {
-  border-radius: 6px;
-  margin-top: 3px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  width: 100px;
-  display: block;
-  letter-spacing: 0.05em;
-  background: #545454;
-  color: #fff;
-  font-weight: bold;
-  font-size: 20px;
-}
-.list-item{
-    font-size:14px;
-    text-align:center;
-    background: #eaedf2;
-}
-
-</style>
- 
     <script>
-        //Webソケットのインスタンス
-        const connect = new WebSocket('ws://localhost:8090');
-      
-        // 通信が開始された時に実行される処理
-        connect.onopen = function () {
-            console.log("ここ通信が開始されました");
-        };
 
-        // Webサーバーからデータを受信したときに実行される処理
-        connect.onmessage = function (event) {
-          
-          const json_difference = event.data;
-          const difference= JSON.parse(json_difference);
-
-            // 受信したデータを表示する
-            const messageDiv = document.getElementById('socket');
-               messageDiv.innerHTML += `<p class='list-item'>${difference[0].name}:${difference[0].comment}</p>`;
-               count++;
-               count_div.innerHTML=`${count}件表示しています。`;
-           
-        };
-
-        // 通信が切断された時に実行される処理
-        connect.onclose = function (e) {
-            console.log('WebSocket通信が終了しました');
-        };
-
-        // 通信中にエラーが発生した時に実行される処理
-        connect.onerror = function (e) {
-            console.log('WebSocketエラーが発生しました');
-        };
-
-        // メッセージを送信する処理
         function sendMessage() {
             let name=document.getElementById('name').value;
             let comment=document.getElementById('comment').value;
             const message=[name,comment];
-            connect.send(message);
+             connect.send(message);
+    
             document.getElementById('name').value='';
             document.getElementById('comment').value='';
-
         }
+        
         //処理をストップトリガー
         let stop_trigger;
         function autoStartMessage(){
@@ -197,9 +86,10 @@ for(i=0;i<comments_Arr.length;i++){
         function autoStopMessage(){
           clearInterval(stop_trigger);
         }
-  
+
         
  </script>
+ 
 </body>
 </html>
 

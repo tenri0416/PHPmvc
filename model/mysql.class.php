@@ -73,4 +73,9 @@ public function Select(){
         $this->mysql->close();
     }
 
+    public function Delete($id){
+        $sql="DELETE FROM comments WHERE id='$id'";
+        $result=$this->mysql->query($sql);
+    }
+
 }

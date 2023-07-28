@@ -1,7 +1,7 @@
 <?php
 //webソケットライブラリーを読み込み
 require 'vendor/autoload.php';
-require 'model/mysqlconnection.php';
+require 'model/mysql.class.php';
 
 
 use Ratchet\MessageComponentInterface;
@@ -22,6 +22,18 @@ class MyWebSocket implements MessageComponentInterface
         //オブジェクトをキーとして使用することができるデータストレージ
         $this->clients = new \SplObjectStorage;
          $this->mysql = new MysqlConnection(); 
+    }
+
+    public function notifyDeletion()
+    {
+        // DBの変更内容を取得
+        $difference = $this->mysql->Select();
+        $json_difference = json_encode($difference);
+
+        // 全クライアントに変更内容を送信
+        foreach ($this->clients as $client) {
+            $client->send($json_difference);
+        }
     }
 
     public function onOpen(ConnectionInterface $conn)
