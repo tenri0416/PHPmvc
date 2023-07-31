@@ -1,7 +1,7 @@
 <?php
  require 'model/mysql.class.php';
 $mysql=new MysqlConnection();
-
+//全件取得
 $allComments=$mysql->AllSelect();
 //json化してJSに渡す
 $json_allComments=json_encode($allComments);
@@ -15,9 +15,9 @@ $json_allComments=json_encode($allComments);
     <link rel="stylesheet" href="css/form.css"></link>
     <!-- WEBソケット読み込み -->
     <script src="web.js"></script>
+    <script src="web2.js"></script>
 </head>
 <body>
-<script src="web.js"></script>
 <form class="Form" action="" method="post">
   <div class="Form-Item">
     <p class="Form-Item-Label">ユーザー名</p>
@@ -30,13 +30,14 @@ $json_allComments=json_encode($allComments);
   </div>
   <button type="button"onclick="sendMessage()"class="Form-Btn">送信</button>
 </form>
-<button type="button" onclick="autoStartMessage()">スタート</button>
-<button type="button" onclick="autoStopMessage()">ストップ</button>
+<button type="button" id="start_btn" onclick="autoStartMessage()">スタート</button>
+<button type="button" id="stop_btn" onclick="autoStopMessage()">ストップ</button>
 
 <div id="view_count" class="count-item"></div>
 
   <div id="socket">
     <script>
+//スタートボタン、ストップボタンのフラグ
 const comments_Arr = <?php echo $json_allComments; ?>;
 const messageDiv = document.getElementById('socket');
 const count_div=document.getElementById('view_count');
@@ -45,7 +46,7 @@ let count=comments_Arr.length;
 count_div.innerHTML=`${count}件表示しています。`;
 
 for(i=0;i<comments_Arr.length;i++){
-  messageDiv.innerHTML += `<p class='list-item'>${comments_Arr[i].id}${comments_Arr[i].name}:${comments_Arr[i].comment}<button onclick="deleteBtn(${comments_Arr[i].id,true})">削除</button></p>`;
+  messageDiv.innerHTML += `<p class='list-item'>${comments_Arr[i].name}:${comments_Arr[i].comment}<button onclick="deleteBtn(${comments_Arr[i].id})">削除</button></p>`;
 
 }
 
@@ -54,19 +55,27 @@ for(i=0;i<comments_Arr.length;i++){
   
     <script>
 
+       //送信処理(8090)
         function sendMessage() {
             let name=document.getElementById('name').value;
             let comment=document.getElementById('comment').value;
             const message=[name,comment];
              connect.send(message);
-    
             document.getElementById('name').value='';
             document.getElementById('comment').value='';
+        }
+        //削除処理(8091)
+        function deleteBtn(deleteId){
+           connect2.send(deleteId);
         }
         
         //処理をストップトリガー
         let stop_trigger;
         function autoStartMessage(){
+          const startBtn=document.getElementById('start_btn');
+          const stopBtn=document.getElementById('stop_btn');
+          startBtn.disabled=true;
+          stopBtn.disabled=false;
           //押すとランダムでメッセージを送る
           const names=['佐藤','鈴木','真屋順子','柴田賢志','瓶鮫一','真屋順子','巽秀太郎','柴田賢志','小林夕岐子','中根徹','YATCH',
           '小林隆','川村真樹','小田冴斗','富田仲次郎','相葉雅紀','ささの堅太','松田侑子','藤田宗久',
@@ -84,12 +93,23 @@ for(i=0;i<comments_Arr.length;i++){
         }
 
         function autoStopMessage(){
+          const startBtn=document.getElementById('start_btn');
+          const stopBtn=document.getElementById('stop_btn');
+          startBtn.disabled=false;;
+          stopBtn.disabled=true;
           clearInterval(stop_trigger);
         }
 
         
  </script>
- 
+ <div class="talk">
+	<div class="talk_left">
+		<p>こちらは左側に表示される吹き出しのメッセージです。<br>二行目はこんな感じ。</p>
+	</div>
+	<div class="talk_right">
+		<p>こちらは右側に表示される吹き出しのメッセージです。<br>二行目はこんな感じ。<br>三行目はこんな感じ。</p>
+	</div>
+</div>
 </body>
 </html>
 

@@ -242,9 +242,38 @@ PHPで実装したサーバーに通信をする
 
       WEBソケットでDB削除してそれが自動で反映されるようにしたい
 
-      順番1 削除が行われたらサーバー側でwebソケットを使用してクライアントに通知する
+      まず、大前提にWebSocketプロコトルイベント
+      1 onOpen クライアントがサーバーに接続したとき
+      2 onMessage クライアントからメッセージを受信したとき
+      3 onClose クライアントが切断したとき
+      4 エラーが起きたとき
 
 
+      jsはサーバーを指定しているだけ
+
+      二つのクラスで同じサーバー、ポートに接続できることはできる
+      $server = IoServer::factory(new HttpServer(new WsServer(new ここを帰る())), 8090);
+
+      上の処理だけのファイルを作成する(ポート、サーバー同じ,指定しているクラスだけ違う)
+      たとえばserver.php
+      //WebSocketサーバーを8080ポートで起動
+$server = IoServer::factory(new HttpServer(new WsServer(new MyWebSocket())), 8090);
+$server->run();
+
+// 別のWebSocketサーバーを同じポートで起動
+$server2 = IoServer::factory(new HttpServer(new WsServer(new MyWebSocket2())), 8090);
+$server2->run();
+
+結果：同じポートでクラスを分けることはできない。
+なのでJsでポート選択して処理を分けるしか方法はない
+さらにPHPでは一つのファイルに二つのサーバー（ポート)起動ができない
+// 別のWebSocketサーバーを別のポートで起動
+ファイル１
+$server = IoServer::factory(new HttpServer(new WsServer(new MyWebSocket())), 8090);
+$server->run();
+ファイル２
+$server2 = IoServer::factory(new HttpServer(new WsServer(new DBWebSocket())), 8091);
+$server2->run();
 
 
 </body>

@@ -73,8 +73,8 @@ public function Select(){
         $this->mysql->close();
     }
 
-    public function Delete($id){
-        $sql="DELETE FROM comments WHERE id='$id'";
+    public function Delete($deleteId){
+        $sql="DELETE FROM comments WHERE id='$deleteId'";
         $result=$this->mysql->query($sql);
     }
 

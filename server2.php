@@ -9,39 +9,40 @@ use Ratchet\ConnectionInterface;
  use Ratchet\Http\HttpServer;
  use Ratchet\WebSocket\WsServer;
 
- class MyWebSocket implements MessageComponentInterface
+class DBWebSocket implements MessageComponentInterface
 {
     protected $clients;
     protected $mysql;
-    protected $sample;
+  
    
     public function __construct()
     {
         //オブジェクトをキーとして使用することができるデータストレージ
         $this->clients = new \SplObjectStorage;
-         $this->mysql = new MysqlConnection(); 
+          $this->mysql = new MysqlConnection(); 
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
         // 新しいクライアントが接続した際の処理
         $this->clients->attach($conn);
-        echo "新しいクライアント:({$conn->resourceId})接続しました\n";
+        echo "新しいDBクライアント:({$conn->resourceId})接続しました\n";
     }
 
     //クライアントからメッセージを受信した際の処理
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $msg_Arr=explode(',',$msg);
-         $this->mysql->Insert($msg_Arr[0],$msg_Arr[1]);
-         $comments=$this->mysql->AllSelect();
+        //DB削除処理
+         $this->mysql->Delete($msg);
+         //DBすべて取得
+         $difference=$this->mysql->AllSelect();
         //ログに出力
         echo "クライアント相手は {$from->resourceId}です.: $msg\n";
-        $json_comments=json_encode($comments);
+        $json_difference=json_encode($difference);
         
         // 全クライアントにメッセージを送信
         foreach ($this->clients as $client) {
-                 $client->send($json_comments);
+                 $client->send($json_difference);
         }
     }
 
@@ -61,9 +62,5 @@ use Ratchet\ConnectionInterface;
 }
 
 
-
-//WebSocketサーバーを8080ポートで起動
-$server = IoServer::factory(new HttpServer(new WsServer(new MyWebSocket())), 8090);
-$server->run();
-
-
+$server2 = IoServer::factory(new HttpServer(new WsServer(new DBWebSocket())), 8091);
+$server2->run();
