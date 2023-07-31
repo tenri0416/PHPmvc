@@ -102,14 +102,7 @@ for(i=0;i<comments_Arr.length;i++){
 
         
  </script>
- <div class="talk">
-	<div class="talk_left">
-		<p>こちらは左側に表示される吹き出しのメッセージです。<br>二行目はこんな感じ。</p>
-	</div>
-	<div class="talk_right">
-		<p>こちらは右側に表示される吹き出しのメッセージです。<br>二行目はこんな感じ。<br>三行目はこんな感じ。</p>
-	</div>
-</div>
+ 
 </body>
 </html>
 
