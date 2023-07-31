@@ -13,7 +13,7 @@ use Ratchet\ConnectionInterface;
 {
     protected $clients;
     protected $mysql;
-    protected $sample;
+
    
     public function __construct()
     {

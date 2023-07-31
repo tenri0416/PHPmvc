@@ -46,7 +46,8 @@ let count=comments_Arr.length;
 count_div.innerHTML=`${count}件表示しています。`;
 
 for(i=0;i<comments_Arr.length;i++){
-  messageDiv.innerHTML += `<p class='list-item'>${comments_Arr[i].name}:${comments_Arr[i].comment}<button onclick="deleteBtn(${comments_Arr[i].id})">削除</button></p>`;
+  messageDiv.innerHTML += `<p id="edit" class="list-item"contenteditable>${comments_Arr[i].name}:${comments_Arr[i].comment}
+  <button onclick="deleteBtn(${comments_Arr[i].id})">削除</button></p>`;
 
 }
 
@@ -99,6 +100,8 @@ for(i=0;i<comments_Arr.length;i++){
           stopBtn.disabled=true;
           clearInterval(stop_trigger);
         }
+
+        
 
         
  </script>

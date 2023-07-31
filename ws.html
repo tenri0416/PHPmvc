@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    
+<style type="text/css">
+.container {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+.msg-log {
+    width: 100%;
+    height: 92%;
+    vertical-align:top;
+    box-sizing: border-box;
+    padding: 0px;
+    border: black solid 1px;
+    overflow-y: scroll;
+}
+.input-area {
+    width: 100%;
+    box-sizing: border-box;
+}
+.msg {
+    width: 90%;
+    height: 8%;
+    vertical-align:top;
+    box-sizing: border-box;
+    padding: 0px;
+    float: left;
+}
+.btn {
+    width: 10%;
+    height: 8%;
+    vertical-align:top;
+    box-sizing: border-box;
+    padding: 0px;
+}
+.receive-msg-left {
+    border-radius: 10px;
+    border: black solid 1px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    float: left;
+}
+.receive-msg-right {
+    border-radius: 10px;
+    border: black solid 1px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    float: right;
+    background-color: #00FF00;
+}
+.br {
+    clear: both;
+}
+</style>
+<script type="text/javascript">
+
+  var conn = "";
+
+  function open(){
+
+      conn = new WebSocket('ws://localhost:8282');
+
+      conn.onopen = function(e) {
+      };
+
+      conn.onerror = function(e) {
+        alert("エラーが発生しました");
+      };
+
+      conn.onmessage = function(e) {
+          var data = JSON.parse(e.data);
+          var divObj = document.createElement("DIV");
+          if (data["position"] == "left") {
+              divObj.className = 'receive-msg-left';
+          } else {
+              divObj.className = 'receive-msg-right';
+          }
+          var msgSplit = data["msg"].split('\n');
+          for (var i in msgSplit) {
+              var msg = document.createTextNode(msgSplit[i]);
+              var rowObj = document.createElement("DIV");
+              rowObj.appendChild(msg);
+              divObj.appendChild(rowObj);
+          }
+
+          var msgLog = document.getElementById("msg_log");
+          msgLog.appendChild(divObj);
+
+          var br = document.createElement("BR");
+          br.className = 'br';
+          msgLog.appendChild(br);
+
+          msgLog.scrollTop = msgLog.scrollHeight;
+
+      };
+
+      conn.onclose = function() {
+          alert("切断しました");
+          setTimeout(open, 5000);
+      };
+
+  }
+
+  function send(){
+      conn.send(document.getElementById("msg").value);
+  }
+
+  function close(){
+      conn.close();
+  }
+
+  open();
+
+</script>
+</head>
+<body>
+    <div class="container">
+        <div id="msg_log" class="msg-log"></div>
+        <div class="input-area">
+            <textarea id="msg" class="msg"></textarea>
+            <button class="btn" onclick="send();" >送信</button>
+        </div>
+    </div>
+</body>
+</html>
